@@ -9,7 +9,6 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 
-
 class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,25 +22,25 @@ class MainActivity : Activity() {
         ip: String = BuildConfig.LAN_BROADCAST_MASK,
         mac: String = BuildConfig.LAN_DST_MAC_ADDRESS
     ) {
-        try {
-            val macBytes = getMacBytes(mac)
-            val bytes = ByteArray(6 + 16 * macBytes.size)
-            for (i in 0..5) {
-                bytes[i] = 0xff.toByte()
+        DatagramSocket().use { socket ->
+            try {
+                val macBytes = getMacBytes(mac)
+                val bytes = ByteArray(6 + 16 * macBytes.size)
+                for (i in 0..5) {
+                    bytes[i] = 0xff.toByte()
+                }
+                var i = 6
+                while (i < bytes.size) {
+                    System.arraycopy(macBytes, 0, bytes, i, macBytes.size)
+                    i += macBytes.size
+                }
+                val address: InetAddress = InetAddress.getByName(ip)
+                val packet = DatagramPacket(bytes, bytes.size, address, 9)
+                socket.send(packet)
+                Toast.makeText(this, "Wake-on-LAN packet sent.", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Failed to send Wake-on-LAN packet: $e", Toast.LENGTH_LONG).show()
             }
-            var i = 6
-            while (i < bytes.size) {
-                System.arraycopy(macBytes, 0, bytes, i, macBytes.size)
-                i += macBytes.size
-            }
-            val address: InetAddress = InetAddress.getByName(ip)
-            val packet = DatagramPacket(bytes, bytes.size, address, 9)
-            val socket = DatagramSocket()
-            socket.send(packet)
-            socket.close()
-            Toast.makeText(this, "Wake-on-LAN packet sent.", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Failed to send Wake-on-LAN packet: $e", Toast.LENGTH_LONG).show()
         }
     }
 
