@@ -15,7 +15,7 @@ android {
         versionName = "1.0"
 
         buildConfigField("String", "LAN_DST_MAC_ADDRESS", "\"2C:F0:5D:87:9B:A1\"")
-        buildConfigField("String", "LAN_BROADCAST_MASK", "\"192.168.1.255\"")
+        buildConfigField("String", "LAN_BROADCAST_MASK", "\"192.168.1.194\"")
     }
 
     buildTypes {
